@@ -1,0 +1,67 @@
+server:
+  port: 8081
+  ssl:
+    enabled: true
+    key-store: "../certificates/certificates/server.p12"
+    key-store-password: "password_server_1"
+  forward-headers-strategy: framework
+
+#springdoc:
+#  swagger-ui:
+#    enabled: true
+#    path: /swagger-ui.html
+#    config-url: /v3/api-docs/swagger-config
+#    csrf:
+#      enabled: true
+#    urls:
+#      - name: admin
+#        display-name: Admin
+#        url: /admin/v3/api-docs
+#      - name: inventory
+#        display-name: Inventory
+#        url: http://127.0.0.1:8083/v3/api-docs
+#    urls-primary-name: aaa
+#  show-actuator: true
+
+spring:
+  cloud:
+    gateway:
+#      default-filters:
+#        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+#      globalcors:
+#        corsConfigurations:
+#          '[/**]':
+#            allowedOrigins: "*"
+#            allowedMethods: "*"
+#            allowedHeaders: "*"
+      routes:
+        - id: Admin-swagger
+          uri: https://127.0.0.1:8082
+          predicates:
+            - Path=/admin/**, /admin_/**, /swagger-ui/**, /v3/api-docs/**
+        - id: Inventory-swagger
+          uri: forward://127.0.0.1:8083
+          predicates:
+            - Path=/inventory/**, /swagger-ui/**, /v3/api-docs/**
+        - id: Catalogue
+          uri: http://127.0.0.1:8084
+          predicates:
+            - Path=/catalogue/**, /swagger-ui/**, /v3/api-docs/**
+      httpclient:
+        ssl:
+          key-store: "../certificates/certificates/internal.p12"
+          key-store-password: "password_internal"
+          use-insecure-trust-manager: true
+      forwarded:
+        enabled: true
+      x-forwarded:
+        enabled: true
+
+logging:
+  level:
+    org:
+      springdoc: DEBUG
+      springframework:
+        cloud.gateway: DEBUG
+        http.server.reactive: DEBUG
+        web.reactive: DEBUG
