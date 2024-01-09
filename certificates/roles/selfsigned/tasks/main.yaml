@@ -1,0 +1,11 @@
+---
+- name: Create certificates
+  include_tasks: "create_self_signed.yaml"
+  #debug: msg="{{ ca_password }}"
+  vars:
+    cert_name: "{{ item.name }}"
+    cn: "{{ item.cn }}"
+    cert_password: "{{ item.password }}"
+    sans: "{{ item.sans }}"
+    key_usage: "{{ item.key_usage }}"
+  loop: "{{ certs_local }}"

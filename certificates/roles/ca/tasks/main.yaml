@@ -1,0 +1,23 @@
+---
+- name: Create ca
+  include_tasks: "create_ca.yaml"
+  vars:
+    ca_name: "{{ item.key }}"
+    cn: "{{ item.value.cn }}"
+    ca_password: "{{ item.value.password }}"
+    #truststore_password: "{{ item.value.truststore_password }}"
+    truststore_password: "password_trust"
+  with_dict: "{{ ca_local }}"
+
+- name: Create certificates
+  include_tasks: "create_signed_certificate.yaml"
+  #debug: msg="{{ ca_password }}"
+  vars:
+    cert_name: "{{ item.name }}"
+    cn: "{{ item.cn }}"
+    cert_password: "{{ item.password }}"
+    sans: "{{ item.sans }}"
+    key_usage: "{{ item.key_usage }}"
+    ca: "{{ item.ca }}"
+    ca_password: "{{ cert_authorities[item.ca].password }}"
+  loop: "{{ certs_local }}"

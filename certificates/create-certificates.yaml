@@ -1,0 +1,44 @@
+---
+- name: Create CA
+  hosts: localhost
+  vars:
+    - certificate_path: ./certificates
+    - cert_authorities:
+        wine_ca:
+          cn: "Wine CA"
+          password: "password_ca"
+          truststore_password: "password_trust"
+    - signed_certs:
+        - name: "server"
+          cn: "wine service"
+          password: "password_server_1"
+          sans:
+            - "DNS:localhost"
+            - "IP:127.0.0.1"
+          key_usage:
+            - "serverAuth"
+          ca: "wine_ca"
+        - name: "wine_client"
+          cn: "CN=Wine client,O=Test,C=AU"
+          password: "password_wine_client"
+          sans: []
+          key_usage:
+            - "clientAuth"
+          ca: "wine_ca"
+    - self_signed_certs:
+        - name: "internal"
+          cn: "internal"
+          password: "password_internal"
+          sans:
+            - "DNS:localhost"
+            - "IP:127.0.0.1"
+          key_usage:
+            - "serverAuth"
+            - "clientAuth"
+
+  roles:
+    - role: ca
+      ca_local: "{{ cert_authorities }}"
+      certs_local: "{{ signed_certs }}"
+    - role: selfsigned
+      certs_local: "{{ self_signed_certs }}"

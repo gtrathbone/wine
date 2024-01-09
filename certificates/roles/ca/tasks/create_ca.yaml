@@ -1,0 +1,48 @@
+---
+- name: Create private key with password protection
+  community.crypto.openssl_privatekey:
+    path: "{{ certificate_path }}/{{ ca_name }}.key"
+    passphrase: "{{ ca_password }}"
+    type: RSA
+    cipher: auto
+  run_once: true
+  register: pkv
+
+- name: Create certificate signing request (CSR) for CA certificate
+  community.crypto.openssl_csr:
+    path: "{{ certificate_path }}/{{ ca_name }}.csr"
+    privatekey_path: "{{ certificate_path }}/{{ ca_name }}.key"
+    privatekey_passphrase: "{{ ca_password }}"
+    common_name: "{{ cn }}"
+    use_common_name_for_san: false  # since we do not specify SANs, don't use CN as a SAN
+    basic_constraints:
+      - 'CA:TRUE'
+    basic_constraints_critical: true
+    key_usage:
+      - keyCertSign
+    key_usage_critical: true
+    return_content: true
+  register: ca_csr
+
+- name: Create self-signed CA certificate from CSR
+  community.crypto.x509_certificate:
+    path: "{{ certificate_path }}/{{ ca_name }}.pem"
+    csr_content: "{{ ca_csr.csr }}"
+    privatekey_path: "{{ certificate_path }}/{{ ca_name }}.key"
+    privatekey_passphrase: "{{ ca_password }}"
+    provider: selfsigned
+  register: cert
+
+- block:
+    - name: Remove old CA entry from truststore
+      shell: keytool -delete -alias "{{ ca_name }}" -keystore "{{ certificate_path }}/{{ ca_name }}.p12" -storepass "{{ truststore_password }}"
+      ignore_errors: yes
+
+    - name: Create CA truststore
+      shell: keytool -importcert -storetype PKCS12 -keystore "{{ certificate_path }}/{{ ca_name }}.p12" -storepass "{{ truststore_password }}" -alias "{{ ca_name }}" -file "{{ certificate_path }}/{{ ca_name }}.pem" -noprompt
+      register: result
+
+    - debug:
+        msg: "{{ result }}"
+
+  when: cert.changed | bool

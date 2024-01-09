@@ -1,0 +1,42 @@
+---
+- name: Create private key for new certificate on {{ cert_name }}
+  community.crypto.openssl_privatekey:
+    path: "{{ certificate_path }}/{{ cert_name }}.key"
+    passphrase: "{{ cert_password }}"
+    type: RSA
+    cipher: auto
+    force: true
+
+- name: Create certificate signing request (CSR) for {{ cert_name }}
+  community.crypto.openssl_csr:
+    path: "{{ certificate_path }}/{{ cert_name }}.csr"
+    privatekey_path: "{{ certificate_path }}/{{ cert_name }}.key"
+    privatekey_passphrase: "{{ cert_password }}"
+    common_name: "{{ cn }}"
+    subject_alt_name: "{{ sans }}"
+    basic_constraints:
+      - 'CA:FALSE'
+    extended_key_usage: "{{ key_usage }}"
+    return_content: true
+  register: csr
+
+- name: Sign certificate for {{ cert_name}} with ca
+  community.crypto.x509_certificate:
+    path: "{{ certificate_path }}/{{ cert_name }}.pem"
+    csr_content: "{{ csr.csr }}"
+    provider: selfsigned
+    privatekey_path: "{{ certificate_path }}/{{ cert_name }}.key"
+    privatekey_passphrase: "{{ cert_password }}"
+  register: cert
+
+- name: Create PKCS12 for {{ cert_name }}
+  community.crypto.openssl_pkcs12:
+    action: export
+    path: "{{ certificate_path }}/{{ cert_name }}.p12"
+    passphrase: "{{ cert_password }}"
+    friendly_name: "{{ cert_name }}"
+    privatekey_path: "{{ certificate_path }}/{{ cert_name }}.key"
+    privatekey_passphrase: "{{ cert_password }}"
+    certificate_path: "{{ certificate_path }}/{{ cert_name }}.pem"
+    encryption_level: compatibility2022
+    state: present

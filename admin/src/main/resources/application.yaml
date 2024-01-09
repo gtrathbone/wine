@@ -1,0 +1,37 @@
+server:
+  port: 8082
+  ssl:
+    enabled: true
+    key-store: "../certificates/certificates/server.p12"
+    key-store-password: "password_server_1"
+
+client:
+  keystore: "../certificates/certificates/internal.p12"
+  keystore_password: "password_internal"
+spring:
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          client-1:
+            registration:
+              client-id: "admin-client"
+              # the client secret is "secret" (without quotes)
+              client-secret: "{bcrypt}$2a$10$jdJGhzsiIqYFpjJiYWMl/eKDOd8vdyQis2aynmFN0dgJ53XvpzzwC"
+              client-authentication-methods: "client_secret_basic"
+              authorization-grant-types: "client_credentials"
+              scopes: "user.read,user.write"
+logging:
+  level:
+    org.springframework.security: trace
+springdoc:
+  api-docs:
+    path: "/admin/v3/api-docs"
+  show-actuator: true
+  swagger-ui:
+    enabled: true
+
+#####
+openid:
+  base_path: http://localhost:${server.port}
+  token_duration: 1M

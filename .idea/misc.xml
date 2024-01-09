@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/admin/pom.xml" />
+        <option value="$PROJECT_DIR$/inventory/pom.xml" />
+        <option value="$PROJECT_DIR$/catalogue/pom.xml" />
+        <option value="$PROJECT_DIR$/auditfwd/pom.xml" />
+      </list>
+    </option>
+    <option name="workspaceImportForciblyTurnedOn" value="true" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="openjdk-21" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="SbtLocalSettings">
+    <option name="modificationStamps">
+      <map>
+        <entry key="$PROJECT_DIR$/../hello-akka" value="1458875332000" />
+        <entry key="$PROJECT_DIR$/../scala/learning" value="1472905550000" />
+        <entry key="$PROJECT_DIR$/../scalafx/hello-world" value="1473677478000" />
+        <entry key="$PROJECT_DIR$/../scalafx/scalafx" value="1473679680000" />
+        <entry key="$PROJECT_DIR$/../slick-akka-http" value="1458875827000" />
+      </map>
+    </option>
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="ScalaSbtSettings">
+    <option name="customVMPath" value="/usr/bin/java" />
+  </component>
+</project>
